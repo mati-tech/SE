@@ -6,13 +6,13 @@ This repository contains my work for various courses that I am taking at univers
 
 >>First semester: 
 
-Procedure progarmming in CPP
+# Procedure progarmming in CPP
 
 >> Second semester: 
-Object oriented progamming language in CPP
-algorithm and structure of Data
-Python from skratch 
-Python and AI 
+# Object oriented progamming language in CPP
+# algorithm and structure of Data
+# Python from skratch 
+# Python and AI 
 
 ...
 
