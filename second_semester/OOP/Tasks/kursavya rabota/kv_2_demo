@@ -1,0 +1,231 @@
+
+#include <vector> 
+#include <string>
+#include <iostream> 
+using namespace std; 
+
+class cl_base{ 
+	
+	string s_name; 
+	cl_base* p_head_object; 
+	vector <cl_base*> p_sub_objects; 
+	int state = 0; 
+	
+	public: 
+	cl_base(cl_base* p_head_object, string s_name= "Base_object"); 
+	bool set_name(string s_new_name);
+	string get_name(); 
+	cl_base* get_head_object(); 
+	void print_tree(int spaces=4); 
+	~cl_base(); 
+	cl_base* get_sub_object(string S_name);
+	int obj_count(string s_name); 
+	cl_base* search_branch(string s_name);
+	cl_base* search_tree(string s_name);
+	void print_status(int spaces=4); 
+	void set_status(int state);
+	bool get_status();
+};
+
+
+cl_base::cl_base(cl_base* p_head_object, string s_name){ 
+	this->p_head_object = p_head_object; 
+	this->s_name = s_name; 
+	if(this->p_head_object != nullptr) { 
+		p_head_object -> p_sub_objects.push_back(this); // добавление в состав подчиненных головного объектa
+	} 	
+}
+
+bool cl_base::set_name(string s_new_name){ 
+	if(p_head_object != nullptr) { 
+		for (int i = 0; i < p_head_object->p_sub_objects.size(); i++){
+			if (p_head_object->p_sub_objects[i]->s_name== s_new_name) {
+				return false; 
+			}
+		} 
+	} 
+	s_name = s_new_name; 
+	return true; 
+} 
+
+string cl_base::get_name(){ 
+	return this->s_name; 
+}
+
+cl_base* cl_base::get_head_object(){ 
+	return this->p_head_object; 
+}
+
+void cl_base:: print_tree(int spaces ){ 
+	cout << get_name();
+	if(!p_sub_objects.empty()){
+		for(auto child : p_sub_objects){	
+			cout << endl;
+			for(int i = 0; i < spaces; i ++)
+			cout << " ";child->print_tree(spaces+4);
+		}
+	}
+}
+cl_base::~cl_base(){ 
+	for (int i=0 ; i < this->p_sub_objects.size(); i++) { 
+			delete p_sub_objects[i]; 
+		}
+}
+cl_base* cl_base::get_sub_object(string S_name){
+	for (auto sub: p_sub_objects) { 
+			if (sub-> s_name == S_name) {
+				return sub; 
+			}
+		}
+	return nullptr;
+}
+int cl_base::obj_count(string s_name){
+	int count = 0;
+	if(get_name() == s_name)count++;
+	for (auto child : p_sub_objects){
+		count += child->obj_count(s_name);
+	}
+	return count;
+}
+cl_base* cl_base::search_branch(string s_name){
+	if(get_name() == s_name)return this;
+	for (auto child : p_sub_objects){
+		cl_base* sub = child->search_branch(s_name);
+		if(sub)return sub;
+	}
+	return nullptr;
+}
+cl_base* cl_base::search_tree(string s_name){
+	auto obj = this;
+	while(obj->get_head_object()){
+		obj = obj->get_head_object();
+	}
+	if(obj_count(s_name) != 1)return nullptr;
+	return search_branch(s_name);
+}
+void cl_base::print_status(int spaces){
+	cout << get_name();
+	cout << (get_status() ? " is ready" : " is not ready");
+	if(!p_sub_objects.empty()){
+		for(auto sub: p_sub_objects){
+			cout << endl; 
+			for (int i =0; i < spaces; i++)cout<< " "; 
+			sub->print_status(spaces+4); 
+		}
+	}
+}
+void cl_base::set_status(int state){
+	if(get_head_object() && !get_head_object()->get_status()) this->state=0; 
+	else this->state = state; 
+	if(!state){
+		for (auto sub: p_sub_objects){
+			sub->set_status(state); 
+		}
+		
+	}
+}
+bool cl_base::get_status(){
+	return state; 
+}
+
+class cl_1: public cl_base{
+	public: 
+		cl_1(cl_base* p_head, string s_name):cl_base(p_head, s_name){}; 
+};
+
+class cl_2: public cl_base{
+	public: 
+		cl_2(cl_base* p_head, string s_name):cl_base(p_head, s_name){}; 
+};
+
+class cl_3: public cl_base{
+	public: 
+		cl_3(cl_base* p_head, string s_name):cl_base(p_head, s_name){}; 
+};
+
+class cl_4: public cl_base{
+	public: 
+		cl_4(cl_base* p_head, string s_name):cl_base(p_head, s_name){}; 
+};
+
+class cl_5: public cl_base{
+	public: 
+		cl_5(cl_base* p_head, string s_name):cl_base(p_head, s_name){}; 
+};
+
+class cl_6: public cl_base{
+	public: 
+		cl_6(cl_base* p_head, string s_name):cl_base(p_head, s_name){}; 
+};
+// cl_1::cl_1(cl_base* p_head, string s_name):cl_base(p_head, s_name)
+
+class cl_application: public cl_base{
+	public: 
+		cl_application(cl_base* p_head_object);
+		void build_tree_objects(); 
+		int exec_app(); 
+};
+cl_application::cl_application(cl_base* p_head_object): cl_base(p_head_object){}
+
+void cl_application:: build_tree_objects(){
+	string head_name, sub_name;
+	int class_num, state;
+	
+	cin>> head_name; 
+	this->set_name(head_name); 
+	
+	while (true){ 
+		cin>> head_name; 
+		if (head_name=="end tree"){
+			break; 
+		}
+		cl_base* p_head = search_tree(head_name); 
+		cin >> sub_name >> class_num; 
+		
+		if(p_head && !p_head->get_sub_object(sub_name)){
+			switch(class_num){
+			case 2:{
+				new cl_2(p_head, sub_name);
+				break;
+				}
+			case 3:{	
+				new cl_3(p_head, sub_name);
+				break;
+				}
+			case 4:{
+				new cl_4(p_head, sub_name);
+				break;
+			}
+			case 5:{
+				new cl_5(p_head, sub_name);
+				break;
+			}
+			case 6:{
+				new cl_6(p_head, sub_name); 
+				break; 
+				}
+			}
+		}
+		
+	}
+	while (cin>> head_name >> state) {
+		auto obj = search_tree(head_name); 
+		if(obj)obj->set_status(state);
+	}
+}
+int cl_application::exec_app() { 
+	cout << "Object tree" << endl; 
+	print_tree(); 
+	cout << "\nThe tree of objects and their readiness" << endl; 
+	print_status(); 
+	return 0 ; 
+}
+
+
+int main()
+{
+	cl_application ob_cl_application(nullptr); 
+	ob_cl_application.build_tree_objects(); 
+	return ob_cl_application.exec_app(); 
+}
+
